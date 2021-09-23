@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qyfou.bazaar.dao.GoodsDao">
+
+
+    <resultMap id="GoodsMap" type="com.qyfou.bazaar.model.Goods">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="introduction" jdbcType="VARCHAR" property="introduction"/>
+        <result column="tags" jdbcType="VARCHAR" property="tags"
+                typeHandler="com.qyfou.bazaar.common.utils.ListStringTypeHandler"/>
+        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="start_time" jdbcType="BIGINT" property="startTime"/>
+        <result column="end_time" jdbcType="BIGINT" property="endTime"/>
+        <result column="inventory" jdbcType="INTEGER" property="inventory"/>
+        <result column="intro_image" jdbcType="VARCHAR" property="introImage"
+                typeHandler="com.qyfou.bazaar.common.utils.ListStringTypeHandler"/>
+        <!--        <result column="intro_image" jdbcType="VARCHAR" property="introImage"/>-->
+        <result column="heat" jdbcType="INTEGER" property="heat"/>
+        <result column="address_id" jdbcType="BIGINT" property="addressId"/>
+    </resultMap>
+
+
+    <sql id="TableName">
+        `goods`
+    </sql>
+
+    <sql id="BaseColumnList">
+        `id`, `user_id`, `price`, `name`,`introduction`,`tags`,`type`,
+        `start_time`,`end_time`,`inventory`,`intro_image`,`heat`,`address_id`
+    </sql>
+
+
+    <select id="selectGoodsByUserId" resultMap="GoodsMap">
+        select
+        <include refid="BaseColumnList"/>
+        from
+        <include refid="TableName"/>
+        where `user_id`=#{userId}
+        <if test="type>-1">
+            and `type`=#{type}
+        </if>
+        <if test="current >= 0 and count >= 0">
+            LIMIT #{current}, #{count}
+        </if>
+    </select>
+
+
+    <select id="getGoodsTotal" resultType="int">
+        select
+        COUNT(*)
+        from
+        `goods`
+        <if test="type>-1">
+            where `type`=#{type}
+        </if>
+    </select>
+
+
+    <select id="getGoodsNum" resultType="int">
+        select
+        COUNT(*)
+        from
+        `goods` g,`user` u
+        <if test="userId>-1">
+            where `user_id`=#{userId}
+        </if>
+        <if test="type>-1">
+            and `type`=#{type}
+        </if>
+    </select>
+
+    <select id="selectCollectionByUserId" resultMap="GoodsMap">
+        select
+        g.`id`, g.`user_id`, `price`, `name`,`introduction`,`tags`,`type`,
+        `start_time`,`end_time`,`inventory`,`intro_image`,`heat`
+        from
+        `goods` g,`collection` c
+        where g.`id`=c.`goods_id`
+        and c.`user_id`=#{userId}
+        <if test="type>-1">
+            and `type`=#{type}
+        </if>
+        order by c.time desc
+        <if test="current >= 0 and count >= 0">
+            LIMIT #{current}, #{count}
+        </if>
+    </select>
+
+
+    <select id="getCollectionNum" resultType="int">
+        select
+        COUNT(*)
+        from
+        `collection`
+        where
+        `user_id`=#{userId}
+        <if test="type>-1">
+            and `goods_type`=#{type}
+        </if>
+    </select>
+
+
+    <select id="selectRandom" resultMap="GoodsMap">
+        select
+        <include refid="BaseColumnList"/>
+        from
+        <include refid="TableName"/>
+        where `type`=#{type} order by id
+        <if test="current >= 0 and count >= 0">
+            LIMIT #{current}, #{count}
+        </if>
+    </select>
+
+
+    <select id="selectByPriceAsc" resultMap="GoodsMap">
+        select
+        <include refid="BaseColumnList"/>
+        from
+        <include refid="TableName"/>
+        where `type`=#{type}
+        order by price asc
+        <if test="current >= 0 and count >= 0">
+            LIMIT #{current}, #{count}
+        </if>
+    </select>
+
+    <select id="selectByPriceDesc" resultMap="GoodsMap">
+        select
+        <include refid="BaseColumnList"/>
+        from
+        <include refid="TableName"/>
+        where `type`=#{type}
+        order by price desc
+        <if test="current >= 0 and count >= 0">
+            LIMIT #{current}, #{count}
+        </if>
+    </select>
+
+    <select id="selectByHeat" resultMap="GoodsMap">
+        select
+        <include refid="BaseColumnList"/>
+        from
+        <include refid="TableName"/>
+        where `type`=#{type}
+        order by heat desc
+        <if test="current >= 0 and count >= 0">
+            LIMIT #{current}, #{count}
+        </if>
+    </select>
+
+
+    <select id="selectByTime" resultMap="GoodsMap">
+        select
+        <include refid="BaseColumnList"/>
+        from
+        <include refid="TableName"/>
+        where `type`=#{type}
+        order by start_time desc
+        <if test="current >= 0 and count >= 0">
+            LIMIT #{current}, #{count}
+        </if>
+    </select>
+
+    <select id="getCategoryNum" resultType="int">
+        SELECT COUNT(*)
+        FROM
+        <include refid="TableName"/>
+        WHERE `type`=#{type}
+        AND
+        <foreach collection="words" item="word"
+                 open="" separator="AND" close="">
+            `tags` REGEXP #{word}
+        </foreach>
+    </select>
+
+    <select id="selectByCategory" resultMap="GoodsMap">
+        select
+        <include refid="BaseColumnList"/>
+        from
+        <include refid="TableName"/>
+        WHERE `type`=#{type}
+        AND
+        <foreach collection="words" item="word"
+                 open="" separator="AND" close="">
+            `tags` REGEXP #{word}
+        </foreach>
+        order by start_time desc
+        <if test="current >= 0 and count >= 0">
+            LIMIT #{current}, #{count}
+        </if>
+    </select>
+
+    <select id="getDiscoverNum" resultType="int">
+        SELECT COUNT(*)
+        FROM
+        <include refid="TableName"/>
+        WHERE `type`=#{type}
+        AND
+        (
+        <foreach collection="words" item="word"
+                 open="" separator="OR" close="">
+            `tags` REGEXP #{word}
+        </foreach>
+        )
+    </select>
+
+    <select id="selectByDiscover" resultMap="GoodsMap">
+        select
+        <include refid="BaseColumnList"/>
+        from
+        <include refid="TableName"/>
+        WHERE `type`=#{type}
+        AND
+        (
+        <foreach collection="words" item="word"
+                 open="" separator="OR" close="">
+            `tags` REGEXP #{word}
+        </foreach>
+        )
+        order by start_time desc
+        <if test="current >= 0 and count >= 0">
+            LIMIT #{current}, #{count}
+        </if>
+    </select>
+
+    <select id="getHistoryNum" resultType="int">
+        select COUNT(*)
+        from
+        `history`
+        where `user_id`=#{userId}
+    </select>
+
+
+    <select id="getGoodsPicUrl" resultType="String">
+        select intro_image
+        from
+        `goods`
+        <if test="goodsId>-1">
+            where `id`=#{goodsId}
+        </if>
+    </select>
+
+    <delete id="deleteHistory">
+        delete from history
+        where `user_id`=#{userId}
+        order by `id` asc LIMIT 1;
+    </delete>
+
+    <insert id="insertHistory">
+        insert into history(`user_id`,`goods_id`) values(#{userId},#{goodsId});
+    </insert>
+
+
+    <select id="selectByHistory" resultMap="GoodsMap">
+        select
+        g.`id`, g.`user_id`, `price`, `name`,`introduction`,`tags`,`type`,
+        `start_time`,`end_time`,`inventory`,`intro_image`,`heat`
+        from
+        `goods` g,`history` h
+        where h.`user_id`=#{userId}
+        and g.`id`=h.`goods_id`
+        order by h.`id` desc
+    </select>
+
+
+</mapper>

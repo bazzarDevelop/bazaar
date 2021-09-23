@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qyfou.bazaar.dao.AddressDao">
+
+    <update id="updateAddress" parameterType="com.qyfou.bazaar.model.Address">
+        update address
+        <set>
+            <if test="tname != null">tname=#{tname},</if>
+            <if test="location != null">location=#{location},</if>
+            <if test="phone != null">phone=#{phone}</if>
+        </set>
+        where id=#{id}
+    </update>
+
+</mapper>

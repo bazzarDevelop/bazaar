@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qyfou.bazaar.dao.BidDao">
+
+    <resultMap id="BidMap" type="com.qyfou.bazaar.model.Bid">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="goods_id" jdbcType="BIGINT" property="goodsId"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+        <result column="time" jdbcType="BIGINT" property="time"/>
+        <result column="deleted_status" jdbcType="TINYINT" property="deletedStatus"/>
+    </resultMap>
+
+
+    <sql id="TableName">
+        `bid`
+    </sql>
+
+    <sql id="BaseColumnList">
+        `id`, `user_id`, `goods_id`, `price`,`time`,`deleted_status`
+    </sql>
+
+
+    <select id="selectByGoodsId" resultMap="BidMap">
+        select
+        <include refid="BaseColumnList"/>
+        from
+        <include refid="TableName"/>
+        WHERE `goods_id`=#{goodsId}
+        ORDER BY `price` DESC
+        <if test="current >= 0 and count >= 0">
+            LIMIT #{current}, #{count}
+        </if>
+    </select>
+
+
+    <update id="updateDeleteStatus">
+        update
+        <include refid="TableName"/>
+        set `deleted_status` = 1
+        where `id` = #{id}
+    </update>
+
+
+</mapper>

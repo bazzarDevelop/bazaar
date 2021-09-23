@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.qyfou.bazaar.dao.GoodsCommentDao">
+
+
+    <select id="getComment" resultType="HashMap">
+        SELECT c.id, u.name, u.portrait, c.content, c.create_date
+        FROM goods_comment AS c
+        LEFT JOIN user AS u ON u.id = c.user_id
+        WHERE c.type = #{type} AND c.type_id = #{typeId}
+        ORDER BY c.create_date DESC
+        <if test="current >= 0 and count >= 0">
+            LIMIT #{current}, #{count}
+        </if>
+    </select>
+
+    <select id="getCommentNum" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM goods_comment AS c
+        WHERE c.type = #{type} AND c.type_id = #{typeId}
+    </select>
+
+
+</mapper>

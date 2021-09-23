@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qyfou.bazaar.dao.OrderDao">
+
+    <resultMap id="OrderMap" type="com.qyfou.bazaar.model.Order">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="seller_id" jdbcType="BIGINT" property="sellerId"/>
+        <result column="buyer_id" jdbcType="BIGINT" property="buyerId"/>
+        <result column="goods_id" jdbcType="BIGINT" property="goodsId"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="num" jdbcType="INTEGER" property="num"/>
+        <result column="total_price" jdbcType="DECIMAL" property="totalPrice"/>
+        <result column="time" jdbcType="BIGINT" property="time"/>
+        <result column="goods_type" jdbcType="TINYINT" property="goodsType"/>
+        <result column="waybill" jdbcType="VARCHAR" property="waybill"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="intro_image" jdbcType="VARCHAR" property="introImage"/>
+    </resultMap>
+
+    <select id="selectSellerOrdersByUserId" resultMap="OrderMap">
+        select
+        o.`id`, `seller_id`, `buyer_id`, `goods_id`,`status`,`num`,`total_price`,
+        `time`,`goods_type`,`waybill`,`name`,`intro_image`
+        from
+        `goods` g,`orders` o
+        where o.`seller_id`=#{userId}
+        and g.`id`=`goods_id`
+        <if test="status>-1">
+            and `status`=#{status}
+        </if>
+        and `type`=#{type}
+        order by o.`time` desc
+        <if test="current >= 0 and count >= 0">
+            LIMIT #{current}, #{count}
+        </if>
+    </select>
+
+
+    <select id="getSellerOrdersNum" resultType="int">
+        select
+        COUNT(*)
+        from
+        `orders`
+        where `seller_id`=#{userId}
+        <if test="status>-1">
+            and `status`=#{status}
+        </if>
+        and `goods_type`=#{type}
+    </select>
+
+
+    <select id="selectBuyerOrdersByUserId" resultMap="OrderMap">
+        select
+        o.`id`, `seller_id`, `buyer_id`, `goods_id`,`status`,`num`,`total_price`,
+        `time`,`goods_type`,`waybill`,`name`,`intro_image`
+        from
+        `goods` g,`orders` o
+        where o.`buyer_id`=#{userId}
+        and g.`id`=`goods_id`
+        <if test="status>-1">
+            and `status`=#{status}
+        </if>
+        and `type`=#{type}
+        order by o.`time` desc
+        <if test="current >= 0 and count >= 0">
+            LIMIT #{current}, #{count}
+        </if>
+    </select>
+
+
+    <select id="getBuyerOrdersNum" resultType="int">
+        select
+        COUNT(*)
+        from
+        `orders`
+        where `buyer_id`=#{userId}
+        <if test="status>-1">
+            and `status`=#{status}
+        </if>
+        and `goods_type`=#{type}
+    </select>
+
+</mapper>
