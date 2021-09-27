@@ -13,10 +13,10 @@ public class GoodsServiceImpl implements GoodsService {
     @Autowired
     private GoodsDao goodsDao;
 
-    @Override
-    public String getGoodsPicUrl(Long goodsId) {
-        return goodsDao.getGoodsPicUrl(goodsId);
-    }
+//    @Override
+//    public String getGoodsPicUrl(Long goodsId) {
+//        return goodsDao.getGoodsPicUrl(goodsId);
+//    }
 
     public List<Goods> getGoodsList(Long userId, Integer type, int current, int count) {
         if (type == null) type = -1;

@@ -8,7 +8,7 @@ import java.util.Random;
 
 public interface GoodsService {
 
-    String getGoodsPicUrl(Long goodsId);
+//    String getGoodsPicUrl(Long goodsId);
 
     List<Goods> getGoodsList(Long userId, Integer type, int current, int count);
 

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qyfou.bazaar.dao.SearchDao">
+
+
+    <resultMap id="GoodsMap" type="com.qyfou.bazaar.model.Goods">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="introduction" jdbcType="VARCHAR" property="introduction"/>
+        <result column="tags" jdbcType="VARCHAR" property="tags"
+                typeHandler="com.qyfou.bazaar.common.utils.ListStringTypeHandler"/>
+        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="start_time" jdbcType="BIGINT" property="startTime"/>
+        <result column="end_time" jdbcType="BIGINT" property="endTime"/>
+        <result column="inventory" jdbcType="INTEGER" property="inventory"/>
+        <result column="intro_image" jdbcType="VARCHAR" property="introImage"
+                typeHandler="com.qyfou.bazaar.common.utils.ListStringTypeHandler"/>
+        <!--        <result column="intro_image" jdbcType="VARCHAR" property="introImage"/>-->
+        <result column="heat" jdbcType="INTEGER" property="heat"/>
+        <result column="address_id" jdbcType="BIGINT" property="addressId"/>
+    </resultMap>
+
+
+    <sql id="TableName">
+        `goods`
+    </sql>
+
+    <sql id="BaseColumnList">
+        `id`, `user_id`, `price`, `name`,`introduction`,`tags`,`type`,
+        `start_time`,`end_time`,`inventory`,`intro_image`,`heat`,`address_id`
+    </sql>
+
+
+    <select id="getCategoryNum" resultType="int">
+        SELECT COUNT(*)
+        FROM
+        <include refid="TableName"/>
+        WHERE `type`=#{type}
+        AND
+        <foreach collection="words" item="word"
+                 open="" separator="AND" close="">
+            `tags` REGEXP #{word}
+        </foreach>
+    </select>
+
+    <select id="selectByCategory" resultMap="GoodsMap">
+        select
+        <include refid="BaseColumnList"/>
+        from
+        <include refid="TableName"/>
+        WHERE `type`=#{type}
+        AND
+        <foreach collection="words" item="word"
+                 open="" separator="AND" close="">
+            `tags` REGEXP #{word}
+        </foreach>
+        order by start_time desc
+        <if test="current >= 0 and count >= 0">
+            LIMIT #{current}, #{count}
+        </if>
+    </select>
+
+    <select id="getDiscoverTagsNum" resultType="int">
+        SELECT COUNT(*)
+        FROM
+        <include refid="TableName"/>
+        WHERE `type`=#{type}
+        AND
+        (
+        <foreach collection="words" item="word"
+                 open="" separator="OR" close="">
+            `tags` REGEXP #{word}
+        </foreach>
+        )
+    </select>
+
+    <select id="selectByDiscoverTags" resultMap="GoodsMap">
+        select
+        <include refid="BaseColumnList"/>
+        from
+        <include refid="TableName"/>
+        WHERE `type`=#{type}
+        AND
+        (
+        <foreach collection="words" item="word"
+                 open="" separator="OR" close="">
+            `tags` REGEXP #{word}
+        </foreach>
+        )
+        order by start_time desc
+        <if test="current >= 0 and count >= 0">
+            LIMIT #{current}, #{count}
+        </if>
+    </select>
+
+
+    <select id="selectByDiscoverKey" resultMap="GoodsMap">
+        select
+        <include refid="BaseColumnList"/>
+        from
+        <include refid="TableName"/>
+        WHERE `type`=#{type}
+        AND
+         `name` like concat ('%',#{key},'%')
+        order by start_time desc
+        <if test="current >= 0 and count >= 0">
+            LIMIT #{current}, #{count}
+        </if>
+    </select>
+
+
+    <select id="getDiscoverKeyNum" resultType="int">
+        SELECT COUNT(*)
+        FROM
+        <include refid="TableName"/>
+        WHERE `type`=#{type}
+        AND
+         `name` like concat ('%',#{key},'%')
+    </select>
+
+    <select id="selectByHeat" resultType="java.lang.String">
+        SELECT `name`
+        FROM
+        `tags`
+         order by heat desc
+        LIMIT 0, 6
+    </select>
+
+
+    <select id="selectByHistory" resultType="java.lang.String">
+        SELECT `tags`
+        FROM
+        `search_history`
+        WHERE `user_id`=#{userId}
+         order by id desc
+        LIMIT #{current}, 1
+    </select>
+
+    <select id="getHistoryNum" resultType="int">
+        SELECT COUNT(*)
+        FROM
+        `search_history`
+        WHERE `user_id`=#{userId}
+    </select>
+
+
+    <delete id="deleteHistory">
+        delete from `search_history`
+        where `user_id`=#{userId}
+        order by `id` asc LIMIT 1;
+    </delete>
+
+    <insert id="insertHistory">
+        insert into `search_history`(`user_id`,`tags`) values(#{userId},#{tags});
+    </insert>
+
+</mapper>

@@ -164,72 +164,10 @@
         </if>
     </select>
 
-    <select id="getCategoryNum" resultType="int">
-        SELECT COUNT(*)
-        FROM
-        <include refid="TableName"/>
-        WHERE `type`=#{type}
-        AND
-        <foreach collection="words" item="word"
-                 open="" separator="AND" close="">
-            `tags` REGEXP #{word}
-        </foreach>
-    </select>
-
-    <select id="selectByCategory" resultMap="GoodsMap">
-        select
-        <include refid="BaseColumnList"/>
-        from
-        <include refid="TableName"/>
-        WHERE `type`=#{type}
-        AND
-        <foreach collection="words" item="word"
-                 open="" separator="AND" close="">
-            `tags` REGEXP #{word}
-        </foreach>
-        order by start_time desc
-        <if test="current >= 0 and count >= 0">
-            LIMIT #{current}, #{count}
-        </if>
-    </select>
-
-    <select id="getDiscoverNum" resultType="int">
-        SELECT COUNT(*)
-        FROM
-        <include refid="TableName"/>
-        WHERE `type`=#{type}
-        AND
-        (
-        <foreach collection="words" item="word"
-                 open="" separator="OR" close="">
-            `tags` REGEXP #{word}
-        </foreach>
-        )
-    </select>
-
-    <select id="selectByDiscover" resultMap="GoodsMap">
-        select
-        <include refid="BaseColumnList"/>
-        from
-        <include refid="TableName"/>
-        WHERE `type`=#{type}
-        AND
-        (
-        <foreach collection="words" item="word"
-                 open="" separator="OR" close="">
-            `tags` REGEXP #{word}
-        </foreach>
-        )
-        order by start_time desc
-        <if test="current >= 0 and count >= 0">
-            LIMIT #{current}, #{count}
-        </if>
-    </select>
-
     <select id="getHistoryNum" resultType="int">
         select COUNT(*)
         from
-        `history`
+        `browse_history`
         where `user_id`=#{userId}
     </select>
 
@@ -244,13 +182,13 @@
     </select>
 
     <delete id="deleteHistory">
-        delete from history
+        delete from `browse_history`
         where `user_id`=#{userId}
         order by `id` asc LIMIT 1;
     </delete>
 
     <insert id="insertHistory">
-        insert into history(`user_id`,`goods_id`) values(#{userId},#{goodsId});
+        insert into `browse_history`(`user_id`,`goods_id`) values(#{userId},#{goodsId});
     </insert>
 
 
@@ -259,7 +197,7 @@
         g.`id`, g.`user_id`, `price`, `name`,`introduction`,`tags`,`type`,
         `start_time`,`end_time`,`inventory`,`intro_image`,`heat`
         from
-        `goods` g,`history` h
+        `goods` g,`browse_history` h
         where h.`user_id`=#{userId}
         and g.`id`=h.`goods_id`
         order by h.`id` desc

@@ -19,11 +19,11 @@ public class GoodsController {
     @Autowired
     private GoodsBase goodsBase;
 
-    //根据商品拍卖品的id获取对应url
-    @GetMapping("/image")
-    public Object getGoodsPicUrl(Long id) {
-        return goodsServiceImpl.getGoodsPicUrl(id);
-    }
+//    //根据商品拍卖品的id获取对应url
+//    @GetMapping("/image")
+//    public Object getGoodsPicUrl(Long id) {
+//        return goodsServiceImpl.getGoodsPicUrl(id);
+//    }
 
     //获取商品拍卖品总数,type指定商品类型:普通商品 拍卖品
     @GetMapping("/nums/total")
@@ -89,18 +89,20 @@ public class GoodsController {
         return goodsBase.findById(id);
     }
 
-
+   //更新用户的历史浏览记录
     @PostMapping("/history/update")
     public Object updateHistory(Long userId, Long goodsId) {
         return goodsServiceImpl.updateHistory(userId, goodsId);
     }
 
+    //获取用户历史浏览记录表
     @GetMapping("/history")
     public Object getGoodsByHistory(Long userId) {
         return goodsServiceImpl.getGoodsByHistory(userId);
     }
 
 
+    //上传商品图片
     @PostMapping("/uploadImage")
     public Object uploadImage(HttpServletRequest request) throws Exception {
         List<MultipartFile> files = ((MultipartHttpServletRequest) request).getFiles("file");
@@ -108,6 +110,7 @@ public class GoodsController {
         return "OK";
     }
 
+    //添加商品实体
     @PostMapping("/add")
     public Object addGoods(@RequestBody Goods goods){
         goodsBase.save(goods);
